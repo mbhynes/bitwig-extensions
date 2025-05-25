@@ -32,7 +32,7 @@ java {
     sourceCompatibility = JavaVersion.VERSION_21
 
     jar {
-        archiveFileName = 'BitwigControllers.bwextension'
+        archiveFileName = 'apcmk2-custom.bwextension'
     }
 }
 

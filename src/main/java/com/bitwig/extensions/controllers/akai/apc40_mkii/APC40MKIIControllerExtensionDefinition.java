@@ -10,12 +10,12 @@ import com.bitwig.extension.controller.api.ControllerHost;
 
 public class APC40MKIIControllerExtensionDefinition extends ControllerExtensionDefinition
 {
-   private final static UUID ID = UUID.fromString("0b134b19-a791-4aa8-8a2f-1fdd2b73c4fc");
+   private final static UUID ID = UUID.fromString("0b134b19-a791-4aa8-8a2f-000000000000");
 
    @Override
    public String getName()
    {
-      return "APC40 mkII";
+      return "APC40 mkII custom";
    }
 
    @Override
@@ -27,7 +27,7 @@ public class APC40MKIIControllerExtensionDefinition extends ControllerExtensionD
    @Override
    public String getAuthor()
    {
-      return "Bitwig";
+      return "Bitwiggish";
    }
 
    @Override
@@ -90,13 +90,13 @@ public class APC40MKIIControllerExtensionDefinition extends ControllerExtensionD
       {
          case LINUX ->
          {
-            inputNames[0] = "APC40 mkII MIDI 1";
-            outputNames[0] = "APC40 mkII MIDI 1";
+            inputNames[0] = "APC40 mkII MIDI 1 custom";
+            outputNames[0] = "APC40 mkII MIDI 1 custom";
          }
          case WINDOWS, MAC ->
          {
-            inputNames[0] = "APC40 mkII";
-            outputNames[0] = "APC40 mkII";
+            inputNames[0] = "APC40 mkII custom";
+            outputNames[0] = "APC40 mkII custom";
          }
       }
 
