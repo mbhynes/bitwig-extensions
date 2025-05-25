@@ -154,6 +154,7 @@ class APC40MKIIControllerExtension extends ControllerExtension
    public void init()
    {
       final ControllerHost host = getHost();
+      host.println("APC40 mkII - custom script initializing.");
 
       mApplication = host.createApplication();
       mProject = host.getProject();
