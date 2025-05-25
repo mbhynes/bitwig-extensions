@@ -21,6 +21,15 @@ echo 'export PATH="/usr/local/opt/openjdk@21/bin:$PATH"' >> ~/.zshrc
 ```
 
 ### Building the project
+Note that the `build.gradle` file has been modified on this branch to compile only a subset of class files.
+This may be built with:
 ```
-./gradlew build
+./gradlew clean jar
+```
+
+### Linking the extension
+The jar file (`.bwextension`) can now be linked from the [extension directory](https://www.bitwig.com/support/technical_support/how-do-i-add-a-controller-extension-or-script-17/):
+```
+# symlink it so that we can iteratively recompile it
+ln -s $PWD/build/libs/apcmk2-custom.bwextension ~/Documents/Bitwig\ Studio/Controller\ Scripts 
 ```
