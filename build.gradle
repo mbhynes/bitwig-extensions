@@ -32,7 +32,7 @@ java {
     sourceCompatibility = JavaVersion.VERSION_21
 
     jar {
-        archiveFileName = 'apcmk2custom.bwextension'
+        archiveFileName = 'controllers_custom.bwextension'
     }
 }
 

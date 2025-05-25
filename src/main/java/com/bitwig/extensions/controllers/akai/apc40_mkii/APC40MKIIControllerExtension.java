@@ -174,7 +174,7 @@ class APC40MKIIControllerExtension extends ControllerExtension
       mMasterTrack = host.createMasterTrack(5);
       mMasterTrack.isStopped().markInterested();
 
-      mTrackCursor = host.createCursorTrack("cursor-track", "Akai APC40 mkII", 8, 0, true);
+      mTrackCursor = host.createCursorTrack("cursor-track", "Akai APC40 mkII custom", 8, 0, true);
       mTrackCursor.exists().markInterested();
       mTrackCursor.isGroup().markInterested();
       mTrackCursor.volume().markInterested();
