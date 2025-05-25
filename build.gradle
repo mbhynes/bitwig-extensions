@@ -59,3 +59,15 @@ processResources {
         }
     }
 }
+
+sourceSets {
+    main {
+        java {
+            include 'com/bitwig/extensions/controllers/novation/**'
+            include 'com/bitwig/extensions/controllers/akai/apc/**'
+            include 'com/bitwig/extensions/controllers/akai/apcmk2/**'
+            include 'com/bitwig/extensions/framework/**'
+            include 'com/bitwig/extensions/util/**'
+        }
+    }
+}
