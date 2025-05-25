@@ -30,7 +30,6 @@ This may be built with:
 ### Linking the extension
 The jar file (`.bwextension`) can now be linked from the [extension directory](https://www.bitwig.com/support/technical_support/how-do-i-add-a-controller-extension-or-script-17/):
 ```
-# symlink it so that we can iteratively recompile it
 ln -s $PWD/build/libs/apcmk2custom.bwextension ~/Documents/Bitwig\ Studio/Extensions
 ```
 
