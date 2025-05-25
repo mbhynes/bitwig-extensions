@@ -49,7 +49,6 @@ public class SessionLayer extends Layer {
     private final SceneBank sceneBank;
     private final Scene targetScene;
     private final DisplayValueTracker sceneDisplayValue;
-    private final ViewControl viewControl;
     
     private enum Mode {
         LAUNCH,
@@ -62,7 +61,6 @@ public class SessionLayer extends Layer {
     public SessionLayer(final Layers layers, final LaunchkeyHwElements hwElements, final ViewControl viewControl,
         final LayerPool layerPool, final Transport transport, final DisplayControl displayControl) {
         super(layers, "SESSION_LAYER");
-        this.viewControl = viewControl;
         this.layerPool = layerPool;
         this.displayControl = displayControl;
         final TrackBank trackBank = viewControl.getTrackBank();
@@ -354,7 +352,7 @@ public class SessionLayer extends Layer {
             }
             return RgbState.pulse(color);
         }
-        if (viewControl.canBeSelectedForSeq(trackIndex)) {
+        if (track.canHoldNoteData().get()) {
             return RgbState.RED.pulse();
         }
         return RgbState.OFF;

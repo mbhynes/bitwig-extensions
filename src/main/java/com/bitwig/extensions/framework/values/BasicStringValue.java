@@ -4,13 +4,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.bitwig.extension.callback.StringValueChangedCallback;
-import com.bitwig.extension.controller.api.SettableStringValue;
 import com.bitwig.extension.controller.api.StringValue;
 
 /**
  * Concrete String Value implementation.
  */
-public class BasicStringValue implements StringValue, SettableStringValue {
+public class BasicStringValue implements StringValue {
     private final List<StringValueChangedCallback> callbacks = new ArrayList<>();
     private String value;
     

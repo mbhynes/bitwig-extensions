@@ -25,7 +25,7 @@ public class SendsSliderLayer extends TrackSliderLayer {
         final Layers layers, final MidiProcessor midiProcessor, final LaunchPadPreferences preferences) {
         super("SENDS", controlSurface, layers, midiProcessor, 30, 13);
         bind(viewCursorControl.getTrackBank());
-        preferences.getPanelLayout().addValueObserver((newValue -> {
+        preferences.getPanelLayout().addValueObserver(((oldValue, newValue) -> {
             layout = newValue;
             updateFaderState();
         }));
