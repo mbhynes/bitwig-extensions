@@ -176,6 +176,8 @@ public class SessionLayer extends AbstractSessionLayer {
         } else {
             slot.launch();
         }
+        // Always select the pressed slot to focus it
+        slot.select();
     }
 
     private void handleSlotReleased(final ClipLauncherSlot slot) {
