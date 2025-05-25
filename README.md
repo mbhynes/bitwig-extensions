@@ -31,4 +31,3 @@ This may be built with:
 The jar file (`.bwextension`) can now be linked from the [extension directory](https://www.bitwig.com/support/technical_support/how-do-i-add-a-controller-extension-or-script-17/):
 ```
 cp build/libs/apcmk2custom.bwextension ~/Documents/Bitwig\ Studio/Extensions
-```
