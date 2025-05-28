@@ -84,11 +84,11 @@ public class OxygenProExtension extends ControllerExtension {
       CcButton bankRightButton = hwElements.getButton(OxygenCcAssignments.BANK_RIGHT);
       bankRightButton.bindPressed(mainLayer, () -> {
          debugHost.println("press bank right");
-         sessionLayer.selectNextDevice();
+         sessionLayer.selectNextDevice(debugHost);
       });
 
       CcButton bankLeftButton = hwElements.getButton(OxygenCcAssignments.BANK_LEFT);
-      bankLeftButton.bindPressed(mainLayer, () -> sessionLayer.selectPreviousDevice());
+      bankLeftButton.bindPressed(mainLayer, () -> sessionLayer.selectPreviousDevice(debugHost));
 
       CcButton stopButton = hwElements.getButton(OxygenCcAssignments.STOP);
       stopButton.bindPressed(mainLayer, transport.stopAction());

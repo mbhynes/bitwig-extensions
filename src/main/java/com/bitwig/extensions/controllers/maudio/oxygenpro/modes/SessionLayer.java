@@ -41,6 +41,7 @@ public class SessionLayer extends Layer {
       this.cursorTrack = viewControl.getCursorTrack();
       this.cursorDevice = viewControl.getCursorDevice();
       cursorDevice.hasNext().markInterested();
+      cursorDevice.hasPrevious().markInterested();
       cursorDevice.hasDrumPads().markInterested();
       for (int tInd = 0; tInd < numberOfTracks; tInd++) {
          final int trackIndex = tInd;
@@ -194,17 +195,24 @@ public class SessionLayer extends Layer {
          slotColors[buttonIndex] = RgbColor.toColor(r, g, b);
       });
    }
-   public void selectPreviousDevice() {
-      cursorDevice.selectPrevious();
+   public void selectPreviousDevice(ControllerHost host) {
+      if (cursorDevice.hasPrevious().get()) {
+         cursorDevice.selectPrevious();
+      } else {
+         cursorDevice.selectParent();
+      }
    }
 
-   public void selectNextDevice() {
+   public void selectNextDevice(ControllerHost host) {
+      host.println("CursorDevice: " + cursorDevice.toString());
       if (cursorDevice.hasDrumPads().get() && padLayer != null) {
          Device device = this.padLayer.getSelectedPadDevice();
+         host.println("Found drum pad device: " + device.toString());
          if (device.exists().get()) {
             cursorDevice.selectDevice(device);
          }
       } else {
+         host.println("No drumpad device; selecting next in chain");
          cursorDevice.selectNext();
       }
    }
