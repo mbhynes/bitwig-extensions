@@ -26,8 +26,6 @@ public class SessionLayer extends Layer {
    private final boolean hasSceneLaunchButtons;
    private final PinnableCursorDevice cursorDevice;
    private PadLayer padLayer;
-   private final DrumPadBank drumPadBank;
-   private final DeviceBank[] padDeviceBanks;
 
    public SessionLayer(Layers layers, HwElements hwElements, ViewControl viewControl, Transport transport,
                        OxyConfig config) {
@@ -69,13 +67,6 @@ public class SessionLayer extends Layer {
       hwElements.getButton(OxygenCcAssignments.SCENE_LAUNCH2)
          .bindRelease(this, () -> releaseScene(sceneBank.getScene(1)));
       hwElements.getButton(OxygenCcAssignments.ENCODER_PUSH).bindPressed(this, this::handleEncoderDown);
-      drumPadBank = viewControl.getPrimaryDevice().createDrumPadBank(16);
-      padDeviceBanks = new DeviceBank[16];
-      for (int i = 0; i < 16; i++) {
-         DrumPad pad = drumPadBank.getItemAt(i);
-         padDeviceBanks[i] = pad.createDeviceBank(1);
-         padDeviceBanks[i].getDevice(0).exists().markInterested();
-      }
    }
 
    public void setBackButtonHeld(boolean isPressed) {
@@ -209,20 +200,17 @@ public class SessionLayer extends Layer {
 
    public void selectNextDevice() {
       if (cursorDevice.hasDrumPads().get() && padLayer != null) {
-         Device device = padLayer.getSelectedPadDevice();
+         Device device = this.padLayer.getSelectedPadDevice();
          if (device.exists().get()) {
             cursorDevice.selectDevice(device);
          }
+      } else {
+         cursorDevice.selectNext();
       }
    }
 
    public void setPadLayer(PadLayer padLayer) {
       this.padLayer = padLayer;
-   }
-
-   public Device getSelectedPadDevice() {
-      int selectedPad = this.padLayer.getSelectedIndex();
-      return padDeviceBanks[selectedPad].getDevice(0);
    }
 
 }

@@ -39,6 +39,8 @@ public class PadLayer extends Layer {
    @Inject
    private TrackControl trackControl;
 
+   private final DeviceBank[] padDeviceBanks;
+
    public PadLayer(Layers layers, HwElements hwElements, ViewControl viewControl, MidiProcessor midiProcessor,
                    OxyConfig config, ControllerHost host) {
       super(layers, "PAD_LAYER");
@@ -52,6 +54,12 @@ public class PadLayer extends Layer {
       this.noteInput = midiProcessor.getMidiIn().createNoteInput("PAD CONTROL");
       this.noteInput.setKeyTranslationTable(noteTable);
       drumPadBank = viewControl.getPrimaryDevice().createDrumPadBank(nrOfPads);
+      padDeviceBanks = new DeviceBank[nrOfPads];
+      for (int i = 0; i < nrOfPads; i++) {
+         DrumPad pad = drumPadBank.getItemAt(i);
+         padDeviceBanks[i] = pad.createDeviceBank(1);
+         padDeviceBanks[i].getDevice(0).exists().markInterested();
+      }
       viewControl.getCursorTrack().color().addValueObserver((r, g, b) -> cursorTrackColor = RgbColor.toColor(r, g, b));
       drumPadBank.setIndication(true);
       viewControl.getPrimaryDevice().hasDrumPads().addValueObserver(this::handleHasDrumPadsChanged);
@@ -275,6 +283,11 @@ public class PadLayer extends Layer {
       super.onDeactivate();
       Arrays.fill(noteTable, -1);
       noteInput.setKeyTranslationTable(noteTable);
+   }
+
+   public Device getSelectedPadDevice() {
+      int selectedPad = getSelectedIndex();
+      return padDeviceBanks[selectedPad].getDevice(0);
    }
 
 }
