@@ -26,6 +26,7 @@ public class ModeHandler extends Layer {
 
       sessionLayer.registerModeHandler(this);
       padLayer.registerModeHandler(this);
+      sessionLayer.setPadLayer(padLayer);
       currentLayer = sessionLayer;
       hwElements.getButton(OxygenCcAssignments.BACK).bindIsPressed(this, this::handleBackButton);
       hwElements.bindEncoder(this, hwElements.getMainEncoder(), this::handleEncoder);

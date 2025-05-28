@@ -24,12 +24,12 @@ public abstract class OxygenProExtensionDefinition extends ControllerExtensionDe
 
    @Override
    public String getName() {
-      return String.format("M-Audio Oxygen Pro %s", getKeys());
+      return String.format("M-Audio Oxygen Pro %s - custom", getKeys());
    }
 
    @Override
    public String getAuthor() {
-      return "Bitwig";
+      return "Bitwiggish";
    }
 
    @Override
@@ -40,7 +40,7 @@ public abstract class OxygenProExtensionDefinition extends ControllerExtensionDe
 
    @Override
    public String getHardwareVendor() {
-      return "M-Audio";
+      return "M-Audio custom";
    }
 
    @Override

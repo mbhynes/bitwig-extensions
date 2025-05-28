@@ -24,6 +24,10 @@ public class SessionLayer extends Layer {
    private ModeHandler modeHandler;
    private boolean backButtonHeld = false;
    private final boolean hasSceneLaunchButtons;
+   private final PinnableCursorDevice cursorDevice;
+   private PadLayer padLayer;
+   private final DrumPadBank drumPadBank;
+   private final DeviceBank[] padDeviceBanks;
 
    public SessionLayer(Layers layers, HwElements hwElements, ViewControl viewControl, Transport transport,
                        OxyConfig config) {
@@ -37,6 +41,9 @@ public class SessionLayer extends Layer {
       trackBank.setShouldShowClipLauncherFeedback(true);
       this.numberOfTracks = trackBank.getSizeOfBank();
       this.cursorTrack = viewControl.getCursorTrack();
+      this.cursorDevice = viewControl.getCursorDevice();
+      cursorDevice.hasNext().markInterested();
+      cursorDevice.hasDrumPads().markInterested();
       for (int tInd = 0; tInd < numberOfTracks; tInd++) {
          final int trackIndex = tInd;
          Track track = trackBank.getItemAt(tInd);
@@ -62,6 +69,13 @@ public class SessionLayer extends Layer {
       hwElements.getButton(OxygenCcAssignments.SCENE_LAUNCH2)
          .bindRelease(this, () -> releaseScene(sceneBank.getScene(1)));
       hwElements.getButton(OxygenCcAssignments.ENCODER_PUSH).bindPressed(this, this::handleEncoderDown);
+      drumPadBank = viewControl.getPrimaryDevice().createDrumPadBank(16);
+      padDeviceBanks = new DeviceBank[16];
+      for (int i = 0; i < 16; i++) {
+         DrumPad pad = drumPadBank.getItemAt(i);
+         padDeviceBanks[i] = pad.createDeviceBank(1);
+         padDeviceBanks[i].getDevice(0).exists().markInterested();
+      }
    }
 
    public void setBackButtonHeld(boolean isPressed) {
@@ -189,6 +203,26 @@ public class SessionLayer extends Layer {
          slotColors[buttonIndex] = RgbColor.toColor(r, g, b);
       });
    }
+   public void selectPreviousDevice() {
+      cursorDevice.selectPrevious();
+   }
 
+   public void selectNextDevice() {
+      if (cursorDevice.hasDrumPads().get() && padLayer != null) {
+         Device device = padLayer.getSelectedPadDevice();
+         if (device.exists().get()) {
+            cursorDevice.selectDevice(device);
+         }
+      }
+   }
+
+   public void setPadLayer(PadLayer padLayer) {
+      this.padLayer = padLayer;
+   }
+
+   public Device getSelectedPadDevice() {
+      int selectedPad = this.padLayer.getSelectedIndex();
+      return padDeviceBanks[selectedPad].getDevice(0);
+   }
 
 }

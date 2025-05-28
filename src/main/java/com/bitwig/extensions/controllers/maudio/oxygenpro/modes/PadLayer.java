@@ -208,7 +208,15 @@ public class PadLayer extends Layer {
       pad.selectInEditor();
    }
 
-   private int getSelectedIndex() {
+   public PinnableCursorDevice getPrimaryDevice() {
+      return cursorDevice;
+   }
+
+   public int getSelectedIndex() {
+      return getSelectedIndexInternal();
+   }
+
+   private int getSelectedIndexInternal() {
       for (int i = 0; i < nrOfPads; i++) {
          if (isSelected[i]) {
             return i;

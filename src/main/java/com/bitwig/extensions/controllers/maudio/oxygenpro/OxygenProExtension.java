@@ -8,6 +8,9 @@ import com.bitwig.extensions.framework.Layer;
 import com.bitwig.extensions.framework.di.Context;
 import com.bitwig.extensions.framework.values.FocusMode;
 
+import com.bitwig.extensions.controllers.maudio.oxygenpro.modes.SessionLayer;
+// import com.bitwig.extensions.controllers.maudio.oxygenpro.modes.ModeLayer;
+
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
@@ -66,7 +69,7 @@ public class OxygenProExtension extends ControllerExtension {
 
    void initTransport(Context diContext) {
       Transport transport = diContext.getService(Transport.class);
-      HwElements sessionLayer = diContext.getService(HwElements.class);
+      SessionLayer sessionLayer = diContext.getService(SessionLayer.class);
       transport.isArrangerRecordEnabled().markInterested();
       transport.isClipLauncherOverdubEnabled().markInterested();
       HwElements hwElements = diContext.getService(HwElements.class);
@@ -77,6 +80,15 @@ public class OxygenProExtension extends ControllerExtension {
 
       CcButton playButton = hwElements.getButton(OxygenCcAssignments.PLAY);
       playButton.bindPressed(mainLayer, transport.playAction());
+
+      CcButton bankRightButton = hwElements.getButton(OxygenCcAssignments.BANK_RIGHT);
+      bankRightButton.bindPressed(mainLayer, () -> {
+         debugHost.println("press bank right");
+         sessionLayer.selectNextDevice();
+      });
+
+      CcButton bankLeftButton = hwElements.getButton(OxygenCcAssignments.BANK_LEFT);
+      bankLeftButton.bindPressed(mainLayer, () -> sessionLayer.selectPreviousDevice());
 
       CcButton stopButton = hwElements.getButton(OxygenCcAssignments.STOP);
       stopButton.bindPressed(mainLayer, transport.stopAction());
@@ -100,10 +112,10 @@ public class OxygenProExtension extends ControllerExtension {
       shiftButton.bindPressed(mainLayer, () -> hwElements.getShiftActive().set(true));
       shiftButton.bindRelease(mainLayer, () -> hwElements.getShiftActive().set(false));
 
-//      CcButton backButton = hwElements.getButton(OxygenCcAssignments.BACK);
-//      ModeLayer modeLayer = diContext.getService(ModeLayer.class);
-//      backButton.bindPressed(mainLayer, () -> modeLayer.setIsActive(true));
-//      backButton.bindRelease(mainLayer, () -> modeLayer.setIsActive(false));
+      // CcButton backButton = hwElements.getButton(OxygenCcAssignments.BACK);
+      // ModeLayer modeLayer = diContext.getService(ModeLayer.class);
+      // backButton.bindPressed(mainLayer, () -> modeLayer.setIsActive(true));
+      // backButton.bindRelease(mainLayer, () -> modeLayer.setIsActive(false));
    }
 
    void initPreferences(final ControllerHost host) {
