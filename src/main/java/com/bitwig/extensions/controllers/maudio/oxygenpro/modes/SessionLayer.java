@@ -26,6 +26,7 @@ public class SessionLayer extends Layer {
    private final boolean hasSceneLaunchButtons;
    private final PinnableCursorDevice cursorDevice;
    private PadLayer padLayer;
+   private final CursorRemoteControlsPage remotes;
 
    public SessionLayer(Layers layers, HwElements hwElements, ViewControl viewControl, Transport transport,
                        OxyConfig config) {
@@ -43,6 +44,9 @@ public class SessionLayer extends Layer {
       cursorDevice.hasNext().markInterested();
       cursorDevice.hasPrevious().markInterested();
       cursorDevice.hasDrumPads().markInterested();
+      this.remotes = viewControl.getParameterBank();
+      remotes.selectedPageIndex().markInterested();
+      remotes.pageCount().markInterested();
       for (int tInd = 0; tInd < numberOfTracks; tInd++) {
          final int trackIndex = tInd;
          Track track = trackBank.getItemAt(tInd);
@@ -219,6 +223,22 @@ public class SessionLayer extends Layer {
 
    public void setPadLayer(PadLayer padLayer) {
       this.padLayer = padLayer;
+   }
+
+   public void selectNextRemotePage(ControllerHost host) {
+      int current = remotes.selectedPageIndex().get();
+      int count = remotes.pageCount().get();
+      int target = current + 1 % count;
+      remotes.selectedPageIndex().set(target);
+      cursorDevice.selectInEditor();
+   }
+
+   public void selectPreviousRemotePage(ControllerHost host) {
+      int current = remotes.selectedPageIndex().get();
+      int count = remotes.pageCount().get();
+      int target = current - 1 % count;
+      remotes.selectedPageIndex().set(target);
+      cursorDevice.selectInEditor();
    }
 
 }

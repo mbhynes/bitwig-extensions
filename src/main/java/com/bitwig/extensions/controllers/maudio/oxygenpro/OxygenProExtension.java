@@ -73,10 +73,6 @@ public class OxygenProExtension extends ControllerExtension {
       transport.isArrangerRecordEnabled().markInterested();
       transport.isClipLauncherOverdubEnabled().markInterested();
       HwElements hwElements = diContext.getService(HwElements.class);
-      CcButton rewindButton = hwElements.getButton(OxygenCcAssignments.FAST_RWD);
-      rewindButton.bindRepeatHold(mainLayer, () -> transport.rewind());
-      CcButton forwardButton = hwElements.getButton(OxygenCcAssignments.FAST_FWD);
-      forwardButton.bindRepeatHold(mainLayer, () -> transport.fastForward());
 
       CcButton playButton = hwElements.getButton(OxygenCcAssignments.PLAY);
       playButton.bindPressed(mainLayer, transport.playAction());
@@ -89,6 +85,12 @@ public class OxygenProExtension extends ControllerExtension {
 
       CcButton bankLeftButton = hwElements.getButton(OxygenCcAssignments.BANK_LEFT);
       bankLeftButton.bindPressed(mainLayer, () -> sessionLayer.selectPreviousDevice(debugHost));
+
+      CcButton rewindButton = hwElements.getButton(OxygenCcAssignments.FAST_RWD);
+      rewindButton.bindPressed(mainLayer, () -> sessionLayer.selectPreviousRemotePage(debugHost));
+
+      CcButton forwardButton = hwElements.getButton(OxygenCcAssignments.FAST_FWD);
+      forwardButton.bindPressed(mainLayer, () -> sessionLayer.selectNextRemotePage(debugHost));
 
       CcButton stopButton = hwElements.getButton(OxygenCcAssignments.STOP);
       stopButton.bindPressed(mainLayer, transport.stopAction());
