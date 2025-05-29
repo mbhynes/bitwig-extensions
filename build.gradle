@@ -63,7 +63,8 @@ processResources {
 sourceSets {
     main {
         java {
-            include 'com/bitwig/extensions/controllers/**'
+            include 'com/bitwig/extensions/controllers/nativeinstruments/**'
+            include 'com/bitwig/extensions/controllers/maudio/**'
             include 'com/bitwig/extensions/framework/**'
             include 'com/bitwig/extensions/util/**'
         }
