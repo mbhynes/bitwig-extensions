@@ -47,3 +47,15 @@ sourceSets {
         }
     }
 }
+
+// Bitwig extensions use Java’s ServiceLoader mechanism to discover extension definitions.
+// This mechanism relies on the file in the JAR that lists available classes:
+//  META-INF/services/com.bitwig.extension.ExtensionDefinition
+// Here we filter the list of classes to only our the custom extensions.
+processResources {
+    filesMatching('META-INF/services/com.bitwig.extension.ExtensionDefinition') {
+        filter { line ->
+            line.contains('akai.apcmk2') ? line : null
+        }
+    }
+}
