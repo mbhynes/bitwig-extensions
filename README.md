@@ -33,7 +33,8 @@ The jar file (`.bwextension`) can now be linked from the [extension directory](h
 cp build/libs/apcmk2custom.bwextension ~/Documents/Bitwig\ Studio/Extensions
 ```
 
-### Linking the extension
-The jar file (`.bwextension`) can now be linked from the [extension directory](https://www.bitwig.com/support/technical_support/how-do-i-add-a-controller-extension-or-script-17/):
+### Debugging the extension
+Once bitwig is running, check the logs for errors (this includes JVM stacktraces):
 ```
-cp build/libs/apcmk2custom.bwextension ~/Documents/Bitwig\ Studio/Extensions
+less ~/Library/Logs/Bitwig/BitwigStudio.log
+```
