@@ -33,6 +33,7 @@ public class OxygenProExtension extends ControllerExtension {
    private MidiOut midiOut;
    private MidiIn midiInKey;
    private final OxyConfig config;
+   private Application application;
 
    public OxygenProExtension(final OxygenProExtensionDefinition definition, final ControllerHost host,
                              OxyConfig config) {
@@ -44,6 +45,8 @@ public class OxygenProExtension extends ControllerExtension {
    public void init() {
       host = getHost();
       debugHost = host;
+      application = host.createApplication();
+      application.recordQuantizationGrid().markInterested();
       initPreferences(host);
       final Context diContext = new Context(this);
       diContext.registerService(OxyConfig.class, config);
@@ -93,7 +96,21 @@ public class OxygenProExtension extends ControllerExtension {
       stopButton.bindPressed(mainLayer, transport.stopAction());
 
       CcButton loopButton = hwElements.getButton(OxygenCcAssignments.LOOP);
-      loopButton.bindPressed(mainLayer, transport.isArrangerLoopEnabled().toggleAction());
+      loopButton.bindPressed(mainLayer, () -> {
+         SettableEnumValue quantGrid = application.recordQuantizationGrid();
+         String current = quantGrid.get();
+         String[] values = {"1/4", "1/8", "1/16", "1/32", "OFF"};
+         int idx = 0;
+         for (int i = 0; i < values.length; i++) {
+            if (values[i].equalsIgnoreCase(current)) {
+               idx = i;
+               break;
+            }
+         }
+         int nextIdx = (idx + 1) % values.length;
+         quantGrid.set(values[nextIdx]);
+         host.showPopupNotification("Quantization: " + values[nextIdx]);
+      });
 
       hwElements.getButton(OxygenCcAssignments.METRO)
          .bindPressed(mainLayer, transport.isMetronomeEnabled().toggleAction());
