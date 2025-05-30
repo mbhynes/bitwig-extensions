@@ -30,6 +30,8 @@ public class ModeHandler extends Layer {
       currentLayer = sessionLayer;
       hwElements.getButton(OxygenCcAssignments.BACK).bindIsPressed(this, this::handleBackButton);
       hwElements.bindEncoder(this, hwElements.getMainEncoder(), this::handleEncoder);
+      // BANK_LEFT and BANK_RIGHT are also bound in PadLayer for direct navigation in preset mode.
+      // These bindings here are for mode-based delegation when ModeHandler is the active layer.
       hwElements.getButton(OxygenCcAssignments.BANK_LEFT).bindPressed(this, () -> handleBankLeft());
       hwElements.getButton(OxygenCcAssignments.BANK_RIGHT).bindPressed(this, () -> handleBankRight());
    }
@@ -41,17 +43,17 @@ public class ModeHandler extends Layer {
    
    private void handleBankRight() {
       if (currentLayer == padLayer) {
-         padLayer.handleBankRight();
+         padLayer.selectNextDevice();
       } else {
-         sessionLayer.handleBankRight();
+         sessionLayer.selectNextDevice();
       }
    }
    
    private void handleBankLeft() {
       if (currentLayer == padLayer) {
-         padLayer.handleBankLeft();
+         padLayer.selectPreviousDevice();
       } else {
-         sessionLayer.handleBankLeft();
+         sessionLayer.selectPreviousDevice();
       }
    }
    
@@ -64,7 +66,6 @@ public class ModeHandler extends Layer {
          sessionLayer.setBackButtonHeld(isPressed);
       }
    }
-   
    
    private void handleEncoder(final int dir) {
       if (currentLayer == padLayer) {

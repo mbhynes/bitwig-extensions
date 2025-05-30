@@ -80,6 +80,8 @@ public class PadLayer extends Layer {
       }
       viewControl.getCursorTrack().playingNotes().addValueObserver(this::handleNotePlaying);
       hwElements.getButton(OxygenCcAssignments.ENCODER_PUSH).bindIsPressed(this, this::handleEncoderPressed);
+      hwElements.getButton(OxygenCcAssignments.BANK_LEFT).bindPressed(this, this::selectPreviousDevice);
+      hwElements.getButton(OxygenCcAssignments.BANK_RIGHT).bindPressed(this, this::selectNextDevice);
    }
 
    private void handleEncoderPressed(boolean pressed) {
@@ -92,19 +94,25 @@ public class PadLayer extends Layer {
       this.backButtonHeld = isHeld;
    }
 
-   public void handleBankLeft() {
-      if (backButtonHeld) {
+   public void selectPreviousDevice() {
+      if (cursorDevice.hasPrevious().get()) {
          cursorDevice.selectPrevious();
       } else {
-         trackControl.selectPreviousParameter();
+         cursorDevice.selectParent();
       }
    }
 
-   public void handleBankRight() {
-      if (backButtonHeld) {
-         cursorDevice.selectNext();
+   public void selectNextDevice() {
+      // host.println("CursorDevice: " + cursorDevice.toString());
+      if (cursorDevice.hasDrumPads().get()) {
+         Device device = getSelectedPadDevice();
+         // host.println("Found drum pad device: " + device.toString());
+         if (device.exists().get()) {
+            cursorDevice.selectDevice(device);
+         }
       } else {
-         trackControl.selectNextParameter();
+         // host.println("No drumpad device; selecting next in chain");
+         cursorDevice.selectNext();
       }
    }
 

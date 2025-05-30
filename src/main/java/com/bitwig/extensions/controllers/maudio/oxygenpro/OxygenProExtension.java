@@ -78,19 +78,16 @@ public class OxygenProExtension extends ControllerExtension {
       playButton.bindPressed(mainLayer, transport.playAction());
 
       CcButton bankRightButton = hwElements.getButton(OxygenCcAssignments.BANK_RIGHT);
-      bankRightButton.bindPressed(mainLayer, () -> {
-         debugHost.println("press bank right");
-         sessionLayer.selectNextDevice(debugHost);
-      });
+      bankRightButton.bindPressed(mainLayer, () -> sessionLayer.selectNextDevice());
 
       CcButton bankLeftButton = hwElements.getButton(OxygenCcAssignments.BANK_LEFT);
-      bankLeftButton.bindPressed(mainLayer, () -> sessionLayer.selectPreviousDevice(debugHost));
-
-      CcButton rewindButton = hwElements.getButton(OxygenCcAssignments.FAST_RWD);
-      rewindButton.bindPressed(mainLayer, () -> sessionLayer.selectPreviousRemotePage(debugHost));
+      bankLeftButton.bindPressed(mainLayer, () -> sessionLayer.selectPreviousDevice());
 
       CcButton forwardButton = hwElements.getButton(OxygenCcAssignments.FAST_FWD);
       forwardButton.bindPressed(mainLayer, () -> sessionLayer.selectNextRemotePage(debugHost));
+
+      CcButton rewindButton = hwElements.getButton(OxygenCcAssignments.FAST_RWD);
+      rewindButton.bindPressed(mainLayer, () -> sessionLayer.selectPreviousRemotePage(debugHost));
 
       CcButton stopButton = hwElements.getButton(OxygenCcAssignments.STOP);
       stopButton.bindPressed(mainLayer, transport.stopAction());

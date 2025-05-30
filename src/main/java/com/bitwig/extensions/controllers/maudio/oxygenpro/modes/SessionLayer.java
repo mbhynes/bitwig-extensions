@@ -199,7 +199,7 @@ public class SessionLayer extends Layer {
          slotColors[buttonIndex] = RgbColor.toColor(r, g, b);
       });
    }
-   public void selectPreviousDevice(ControllerHost host) {
+   public void selectPreviousDevice() {
       if (cursorDevice.hasPrevious().get()) {
          cursorDevice.selectPrevious();
       } else {
@@ -207,16 +207,16 @@ public class SessionLayer extends Layer {
       }
    }
 
-   public void selectNextDevice(ControllerHost host) {
-      host.println("CursorDevice: " + cursorDevice.toString());
+   public void selectNextDevice() {
+      // host.println("CursorDevice: " + cursorDevice.toString());
       if (cursorDevice.hasDrumPads().get() && padLayer != null) {
          Device device = this.padLayer.getSelectedPadDevice();
-         host.println("Found drum pad device: " + device.toString());
+         // host.println("Found drum pad device: " + device.toString());
          if (device.exists().get()) {
             cursorDevice.selectDevice(device);
          }
       } else {
-         host.println("No drumpad device; selecting next in chain");
+         // host.println("No drumpad device; selecting next in chain");
          cursorDevice.selectNext();
       }
    }
@@ -228,7 +228,8 @@ public class SessionLayer extends Layer {
    public void selectNextRemotePage(ControllerHost host) {
       int current = remotes.selectedPageIndex().get();
       int count = remotes.pageCount().get();
-      int target = current + 1 % count;
+      int target = (current + 1) % count;
+      host.println(String.format("On page %d/%d; requesting page %d", current, count, target));
       remotes.selectedPageIndex().set(target);
       cursorDevice.selectInEditor();
    }
@@ -236,7 +237,9 @@ public class SessionLayer extends Layer {
    public void selectPreviousRemotePage(ControllerHost host) {
       int current = remotes.selectedPageIndex().get();
       int count = remotes.pageCount().get();
-      int target = current - 1 % count;
+      // Java modulo doesn't return a value in [0, count - 1], so have to double modulo
+      int target = ((current - 1) % count + count) % count;
+      host.println(String.format("On page %d/%d; requesting page %d", current, count, target));
       remotes.selectedPageIndex().set(target);
       cursorDevice.selectInEditor();
    }
