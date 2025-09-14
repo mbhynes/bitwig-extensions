@@ -39,6 +39,8 @@ public class PadLayer extends Layer {
    @Inject
    private TrackControl trackControl;
 
+   private final DeviceBank[] padDeviceBanks;
+
    public PadLayer(Layers layers, HwElements hwElements, ViewControl viewControl, MidiProcessor midiProcessor,
                    OxyConfig config, ControllerHost host) {
       super(layers, "PAD_LAYER");
@@ -52,6 +54,12 @@ public class PadLayer extends Layer {
       this.noteInput = midiProcessor.getMidiIn().createNoteInput("PAD CONTROL");
       this.noteInput.setKeyTranslationTable(noteTable);
       drumPadBank = viewControl.getPrimaryDevice().createDrumPadBank(nrOfPads);
+      padDeviceBanks = new DeviceBank[nrOfPads];
+      for (int i = 0; i < nrOfPads; i++) {
+         DrumPad pad = drumPadBank.getItemAt(i);
+         padDeviceBanks[i] = pad.createDeviceBank(1);
+         padDeviceBanks[i].getDevice(0).exists().markInterested();
+      }
       viewControl.getCursorTrack().color().addValueObserver((r, g, b) -> cursorTrackColor = RgbColor.toColor(r, g, b));
       drumPadBank.setIndication(true);
       viewControl.getPrimaryDevice().hasDrumPads().addValueObserver(this::handleHasDrumPadsChanged);
@@ -72,6 +80,8 @@ public class PadLayer extends Layer {
       }
       viewControl.getCursorTrack().playingNotes().addValueObserver(this::handleNotePlaying);
       hwElements.getButton(OxygenCcAssignments.ENCODER_PUSH).bindIsPressed(this, this::handleEncoderPressed);
+      hwElements.getButton(OxygenCcAssignments.BANK_LEFT).bindPressed(this, this::selectPreviousDevice);
+      hwElements.getButton(OxygenCcAssignments.BANK_RIGHT).bindPressed(this, this::selectNextDevice);
    }
 
    private void handleEncoderPressed(boolean pressed) {
@@ -84,19 +94,25 @@ public class PadLayer extends Layer {
       this.backButtonHeld = isHeld;
    }
 
-   public void handleBankLeft() {
-      if (backButtonHeld) {
+   public void selectPreviousDevice() {
+      if (cursorDevice.hasPrevious().get()) {
          cursorDevice.selectPrevious();
       } else {
-         trackControl.selectPreviousParameter();
+         cursorDevice.selectParent();
       }
    }
 
-   public void handleBankRight() {
-      if (backButtonHeld) {
-         cursorDevice.selectNext();
+   public void selectNextDevice() {
+      // host.println("CursorDevice: " + cursorDevice.toString());
+      if (cursorDevice.hasDrumPads().get()) {
+         Device device = getSelectedPadDevice();
+         // host.println("Found drum pad device: " + device.toString());
+         if (device.exists().get()) {
+            cursorDevice.selectDevice(device);
+         }
       } else {
-         trackControl.selectNextParameter();
+         // host.println("No drumpad device; selecting next in chain");
+         cursorDevice.selectNext();
       }
    }
 
@@ -208,7 +224,15 @@ public class PadLayer extends Layer {
       pad.selectInEditor();
    }
 
-   private int getSelectedIndex() {
+   public PinnableCursorDevice getPrimaryDevice() {
+      return cursorDevice;
+   }
+
+   public int getSelectedIndex() {
+      return getSelectedIndexInternal();
+   }
+
+   private int getSelectedIndexInternal() {
       for (int i = 0; i < nrOfPads; i++) {
          if (isSelected[i]) {
             return i;
@@ -267,6 +291,11 @@ public class PadLayer extends Layer {
       super.onDeactivate();
       Arrays.fill(noteTable, -1);
       noteInput.setKeyTranslationTable(noteTable);
+   }
+
+   public Device getSelectedPadDevice() {
+      int selectedPad = getSelectedIndex();
+      return padDeviceBanks[selectedPad].getDevice(0);
    }
 
 }

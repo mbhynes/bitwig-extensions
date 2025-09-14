@@ -32,18 +32,25 @@ java {
     sourceCompatibility = JavaVersion.VERSION_21
 
     jar {
-        archiveFileName = 'apcmk2custom.bwextension'
+        archiveFileName = 'controllers_custom.bwextension'
     }
 }
 
 sourceSets {
     main {
         java {
+            // Common classes
+            include 'com/bitwig/extensions/framework/**'
+            include 'com/bitwig/extensions/util/**'
+
+            // AKAI controllers
             include 'com/bitwig/extensions/controllers/novation/**'
             include 'com/bitwig/extensions/controllers/akai/apc/**'
             include 'com/bitwig/extensions/controllers/akai/apcmk2/**'
-            include 'com/bitwig/extensions/framework/**'
-            include 'com/bitwig/extensions/util/**'
+
+            // M-Audio controllers (requires nativeinstruments package due to imports)
+            include 'com/bitwig/extensions/controllers/nativeinstruments/**'
+            include 'com/bitwig/extensions/controllers/maudio/**'
         }
     }
 }
@@ -55,7 +62,7 @@ sourceSets {
 processResources {
     filesMatching('META-INF/services/com.bitwig.extension.ExtensionDefinition') {
         filter { line ->
-            line.contains('akai.apcmk2') ? line : null
+            line.contains('akai.apcmk2') || line.contains('maudio.oxygenpro') ? line : null
         }
     }
 }
