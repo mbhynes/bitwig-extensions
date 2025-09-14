@@ -15,12 +15,12 @@ public class AkaiApcKeys25Definition extends ControllerExtensionDefinition {
 
    @Override
    public String getName() {
-      return "APC Key25 mk2";
+      return "APC Key25 mk2 - custom";
    }
 
    @Override
    public String getAuthor() {
-      return "Bitwig";
+      return "Bitwiggish";
    }
 
    @Override
@@ -40,7 +40,7 @@ public class AkaiApcKeys25Definition extends ControllerExtensionDefinition {
 
    @Override
    public String getHardwareModel() {
-      return "APC Key25 mk2";
+      return "APC Key25 mk2 - custom";
    }
 
    @Override

@@ -25,6 +25,7 @@ public class AkaiApcMiniExtension extends AbstractAkaiApcExtension {
 
     @Override
     protected void init(final Context diContext) {
+        getHost().println("APC Mini mk2 - custom script initializing.");
         final DrumPadLayer drumPadLayer = diContext.create(DrumPadLayer.class);
         final SingleLedButton stopAllButton = hwElements.getSceneButton(7);
         ViewControl viewControl = diContext.getService(ViewControl.class);
