@@ -132,11 +132,11 @@ public abstract class AbstractAkaiApcExtension extends ControllerExtension {
 
       int navigationButtonIndex = navOffset;
 
-      bindNavigationButton(navigationButtonIndex++, sceneBank.canScrollBackwards(), () -> sceneBank.scrollBy(-1));
-      bindNavigationButton(navigationButtonIndex++, sceneBank.canScrollForwards(), () -> sceneBank.scrollBy(1));
+      bindNavigationButton(navigationButtonIndex++, sceneBank.canScrollBackwards(), () -> sceneBank.scrollBy(-8));
+      bindNavigationButton(navigationButtonIndex++, sceneBank.canScrollForwards(), () -> sceneBank.scrollBy(8));
 
-      bindNavigationButton(navigationButtonIndex++, trackBank.canScrollBackwards(), () -> trackBank.scrollBy(-1));
-      bindNavigationButton(navigationButtonIndex, trackBank.canScrollForwards(), () -> trackBank.scrollBy(1));
+      bindNavigationButton(navigationButtonIndex++, trackBank.canScrollBackwards(), () -> trackBank.scrollBy(-8));
+      bindNavigationButton(navigationButtonIndex, trackBank.canScrollForwards(), () -> trackBank.scrollBy(8));
    }
 
    private void bindNavigationButton(int buttonIndex, BooleanValue value, Runnable action) {
