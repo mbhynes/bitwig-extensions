@@ -33,8 +33,10 @@ const padColors = {
 };
 
 
-/* Pad Status byte */
+/* Status bytes */
 const PadStatus = 0x99;
+const TransportStatus = 0xb0;
+
 var PadNotes;
 
 var noteInputs = [];
@@ -345,14 +347,36 @@ function exit()
 function onMidi(status, data1, data2)
 {
     pressed = data2 > 0;
-    
+
     /* transport */
-    if (status ==  0xb0) {
+    if (status == TransportStatus) {
+        if (data1 == 114 && pressed == true) {
+            shifted = !shifted;
+            host.showPopupNotification(`shifted: ${shifted}`);
+        }
         if (data1 == 115 && pressed == true) {
-            transport.rewind();
+            // transport.rewind();
+            if (shifted) {
+                cursorDevice.selectPrevious();
+            } else {
+                trackBank.scrollTracksUp();
+                trackBank.scrollTracksUp();
+                trackBank.scrollTracksUp();
+                trackBank.scrollTracksUp();
+                updateButtonLeds();
+            }
         }
         if (data1 == 116 && pressed == true) {
-            transport.fastForward();
+            // transport.fastForward();
+            if (shifted) {
+                cursorDevice.selectNext();
+            } else {
+                trackBank.scrollTracksDown();
+                trackBank.scrollTracksDown();
+                trackBank.scrollTracksDown();
+                trackBank.scrollTracksDown();
+                updateButtonLeds();
+            }
         }
         if (data1 == 117 && pressed == true) {
             transport.stop();
@@ -367,17 +391,14 @@ function onMidi(status, data1, data2)
     }
     
     if (status == PadStatus || status == 0x89) {
-        //
-        
         activePadMode.handleMIDI(data1,data2);
     }
     
     else if (status == bankAStatus) {
         
-      
         if (PRODUCT_ID == MPK225_PID) {
             if (data1 > 74 && data1 < 79) {
-                
+                host.showPopupNotification("deadend code reached in bankAstatus")
             }
         }
         
@@ -403,8 +424,6 @@ function onMidi(status, data1, data2)
                 else if (data1 - S1 == 7) {
                     displayHelpText = !displayHelpText;
                     displayHelpText ? host.showPopupNotification("Popup Notifications On") : host.showPopupNotification("Popup Notifications Off");
-
-                    
                 }
             }
         }
@@ -504,7 +523,12 @@ function ControlsMidi(status,data1, data2) {
     else if(status == bankCStatus) {
         if (data1 >= K1 && data1 < 60) {
             if ( PRODUCT_ID == MPK225_PID) {
-                primaryDevice.getMacro(data1 - K1).getAmount().inc(uint7ToInt7(data2), 128);
+                cursorDevice.getMacro(data1 - K1).getAmount().inc(uint7ToInt7(data2), 128);
+
+                // Not available until API v2+
+                // currentPage = parameterBank.selectedPageIndex().get();
+                // countPages = parameterBank.pageCount().get();
+                // host.showPopupNotification("parameter bank:" + parameterBank + `${currentPage}/${countPages}`);
             }
             else {
                 trackBank.getTrack(data1 - K1).getSend(0).inc(uint7ToInt7(data2), 128);

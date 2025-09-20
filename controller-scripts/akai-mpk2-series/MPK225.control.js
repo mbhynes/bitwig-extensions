@@ -36,16 +36,22 @@ function init()
     setActivePadMode(PadInstrument);
     
 	transport = host.createTransportSection();
+
+    // Not available until API v3+
+    // transport.isArrangerRecordEnabled().markInterested();
+    // transport.isClipLauncherOverdubEnabled().markInterested();
 	application = host.createApplicationSection();
     trackBank = host.createMainTrackBank(8, 2, 16);
     sceneLaunchTrackBank = host.createTrackBank(1,0,64);
 
 
-	cursorTrack = host.createCursorTrack(2, 0);
-	cursorDevice = host.createCursorDevice();
+    cursorTrack = host.createCursorTrack(2, 0);
+    cursorDevice = host.createCursorDevice();
+    parameterBank = cursorDevice.createCursorRemoteControlsPage(8);
 
     primaryDevice = cursorTrack.getPrimaryDevice();
     primaryDevice.addNameObserver(11, "", cursorTrackInstrumentNameObs());
+
 
     cursorTrack.addColorObserver(cursorTrackColorObs());
     cursorTrack.addPitchNamesObserver(cursorTrackpitchObs());
