@@ -1,4 +1,4 @@
-loadAPI(1);
+loadAPI(2);
 
 /* Script Initilization */
 
@@ -29,18 +29,18 @@ function init()
 {
     S1 = 28;
 
-	InitNoteInputs("MPK261")
+	  InitNoteInputs("MPK261")
     initClipArray();
 
 
     setActivePadMode(PadInstrument);
     
-	transport = host.createTransportSection();
+	  transport = host.createTransportSection();
 
     // Not available until API v3+
-    // transport.isArrangerRecordEnabled().markInterested();
-    // transport.isClipLauncherOverdubEnabled().markInterested();
-	application = host.createApplicationSection();
+    transport.isArrangerRecordEnabled().markInterested();
+    transport.isClipLauncherOverdubEnabled().markInterested();
+	  application = host.createApplicationSection();
     trackBank = host.createMainTrackBank(8, 2, 16);
     sceneLaunchTrackBank = host.createTrackBank(1,0,64);
 
@@ -48,6 +48,7 @@ function init()
     cursorTrack = host.createCursorTrack(2, 0);
     cursorDevice = host.createCursorDevice();
     parameterBank = cursorDevice.createCursorRemoteControlsPage(8);
+    parameterBank.markInterested();
 
     primaryDevice = cursorTrack.getPrimaryDevice();
     primaryDevice.addNameObserver(11, "", cursorTrackInstrumentNameObs());
@@ -58,36 +59,32 @@ function init()
     
     
     trackBank.getClipLauncherScenes().addNameObserver(sceneLaunchObs());
+	
 
 
-	for (var p = 0; p < 8; p++)
-	{
-		var macro = primaryDevice.getMacro(p).getAmount();
-		var parameter = cursorDevice.getParameter(p);
-		var track = trackBank.getTrack(p);
-        
-        track.getArm().addValueObserver(armObsFunction(p));
-        track.getMute().addValueObserver(muteObsFunction(p));
-        track.getSolo().addValueObserver(soloObsFunction(p));
-        
-        macro.setIndication(true);
-		parameter.setIndication(true);
-		parameter.setLabel("P" + (p + 1));
-		track.getVolume().setIndication(true);
-		track.getPan().setIndication(true);
-		track.getSend(0).setIndication(true);
-		track.getSend(1).setIndication(true);
-        
-        var clipLauncherSlots = track.getClipLauncherSlots();
-        clipLauncherSlots.addIsPlayingObserver(clipPlayingObs(p));
-        clipLauncherSlots.addHasContentObserver(clipContentObs(p));
-        clipLauncherSlots.addIsRecordingObserver(clipRecordObs(p));
-        clipLauncherSlots.setIndication(true);
+    for (var p = 0; p < 8; p++) {
+      // var macro = primaryDevice.getMacro(p).getAmount();
+      println("=-================================");
+      // var parameter = cursorDevice.getParameter(p);
+      var track = trackBank.getTrack(p);
+          
+      track.getArm().addValueObserver(armObsFunction(p));
+      track.getMute().addValueObserver(muteObsFunction(p));
+      track.getSolo().addValueObserver(soloObsFunction(p));
+      
+      // macro.setIndication(true);
+      // parameter.setIndication(true);
+      // parameter.setLabel("P" + (p + 1));
+      track.getVolume().setIndication(true);
+      track.getPan().setIndication(true);
+      track.getSend(0).setIndication(true);
+      track.getSend(1).setIndication(true);
+          
+      var clipLauncherSlots = track.getClipLauncherSlots();
+      clipLauncherSlots.addIsPlayingObserver(clipPlayingObs(p));
+      clipLauncherSlots.addHasContentObserver(clipContentObs(p));
+      clipLauncherSlots.addIsRecordingObserver(clipRecordObs(p));
+      clipLauncherSlots.setIndication(true);
     }
-	
-
-
-
-	
     println("Akai Profressional MPK225 Bitwig Controller Script");
 }

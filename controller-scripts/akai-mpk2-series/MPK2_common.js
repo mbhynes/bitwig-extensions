@@ -523,12 +523,12 @@ function ControlsMidi(status,data1, data2) {
     else if(status == bankCStatus) {
         if (data1 >= K1 && data1 < 60) {
             if ( PRODUCT_ID == MPK225_PID) {
-                cursorDevice.getMacro(data1 - K1).getAmount().inc(uint7ToInt7(data2), 128);
+                // cursorDevice.getMacro(data1 - K1).getAmount().inc(uint7ToInt7(data2), 128);
 
                 // Not available until API v2+
-                // currentPage = parameterBank.selectedPageIndex().get();
-                // countPages = parameterBank.pageCount().get();
-                // host.showPopupNotification("parameter bank:" + parameterBank + `${currentPage}/${countPages}`);
+                currentPage = parameterBank.selectedPageIndex().get();
+                countPages = parameterBank.pageCount().get();
+                host.showPopupNotification("parameter bank:" + parameterBank + `${currentPage}/${countPages}`);
             }
             else {
                 trackBank.getTrack(data1 - K1).getSend(0).inc(uint7ToInt7(data2), 128);
