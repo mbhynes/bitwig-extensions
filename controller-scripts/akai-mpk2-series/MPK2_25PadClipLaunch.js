@@ -1,27 +1,20 @@
 var PadClipLauncher = new PadMode();
 
 
-var ClipBanks = {
-    Bank_A:0x01,
-    Bank_B:0x02
-};
+// Removed bank A/B functionality - now works with 4 tracks only
 
 
 PadClipLauncher.init = function() {
     if (displayHelpText) {
-        if (activeClipBank == ClipBanks.Bank_A) {
-            host.showPopupNotification("Pads: Clip Launch: 1 - 4");
-        }
-        else {
-            host.showPopupNotification("Pads: Clip Launch: 5 - 8");
-        }
+        host.showPopupNotification("Pads: Clip Launch: Tracks 1 - 4");
     }
 
     PadNotes.setShouldConsumeEvents(false);
     PadNotes.setKeyTranslationTable(PadMIDITable.OFF);
 
-    for(var x = 0; x < 8; x++) {
-        for (var y = 0; y < 8; y++) {
+    // Update LEDs for 4 tracks only (16x4 grid)
+    for(var x = 0; x < 4; x++) {
+        for (var y = 0; y < 16; y++) {
             PadClipLauncher.updateClipLED(x,y);
         }
     }
@@ -29,12 +22,15 @@ PadClipLauncher.init = function() {
 
 PadClipLauncher.handleMIDI = function (data1,data2) {
     var pressed = data2 > 0;
-    var trackAdd = 0;
-    activeClipBank == ClipBanks.Bank_A ? trackAdd = 0 : trackAdd = 4;
     if (pressed == true) {
-        var track = ((data1 - 36) % 4) + trackAdd;
+        // Map pad to track (0-3) and clip slot
+        var track = (data1 - 36) % 4;
         var clip = PadClipLauncher.getClipForMidiNote(data1);
+      if (shifted) {
+        trackBank.getTrack(track).stop();
+      } else {
         trackBank.getTrack(track).getClipLauncherSlots().launch(clip);
+      }
     }
 }
 
@@ -54,13 +50,12 @@ PadClipLauncher.clipPlayingObs = function(track,slot,isPlaying) {
     this.updateClipLED(track,slot);
 }
 
-PadClipLauncher.getPadFromTrackSlot = function (track,slot, bank) {
+PadClipLauncher.getPadFromTrackSlot = function (track,slot) {
     
     var Pad;
     var newslot;
 
-    if (bank == ClipBanks.Bank_B) { track = track - 4; }
-
+    // Simplified mapping for 4 tracks only
     if ( slot < 2) {
         newslot = Math.abs(slot - 1);
         Pad = track + (newslot * 4);
@@ -86,8 +81,9 @@ PadClipLauncher.getPadFromTrackSlot = function (track,slot, bank) {
 
 PadClipLauncher.updateClipLED = function(track, slot) {
     
-    if ( track < 4 && activeClipBank == ClipBanks.Bank_A)  {
-        Pad = this.getPadFromTrackSlot(track,slot,activeClipBank);
+    // Only handle tracks 0-3 (4 tracks total)
+    if ( track < 4 )  {
+        Pad = this.getPadFromTrackSlot(track,slot);
         var clipData = clipSlots[track][slot];
         if(clipData.recording == true) {
             lightPad (padColors['Red'],Pad,"Off");
@@ -97,22 +93,6 @@ PadClipLauncher.updateClipLED = function(track, slot) {
             lightPad (padColors['Green'],Pad,"Off");
         }
 
-        else {
-            lightPad (clipData.color,Pad,"Off");
-        }
-    }
-
-    else if ( track > 3 && activeClipBank == ClipBanks.Bank_B)  {
-        Pad = this.getPadFromTrackSlot(track,slot,activeClipBank);
-        var clipData = clipSlots[track][slot];
-        if(clipData.recording == true) {
-            lightPad (padColors['Red'],Pad,"Off");
-        }
-        
-        else if(clipData.playing == true) {
-            lightPad (padColors['Green'],Pad,"Off");
-        }
-        
         else {
             lightPad (clipData.color,Pad,"Off");
         }

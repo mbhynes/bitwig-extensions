@@ -65,15 +65,14 @@ var S_225_BankC = 106;
 /* Mode defines*/
 var usingDrumMachine = false;
 var shifted = false;
-var activeClipBank;
 var displayHelpText = true;
 
 
 /* arrays to keep track of track states */
-var armed = initArray(0, 8);
-var muted = initArray(0, 8);
-var soloed = initArray(0, 8);
-var clipSlots = create2DArray(8,16);
+var armed = initArray(0, 4);
+var muted = initArray(0, 4);
+var soloed = initArray(0, 4);
+var clipSlots = create2DArray(4,16);
 
 
 var drumKeys = initArray(false,128);
@@ -226,7 +225,8 @@ function setSwitchLED(swich, bank, value) {
 }
 
 function updateButtonLeds() {
-    for (var x = 0; x < 8; x++) {
+    // This is updating the LED pads on the controller; there are 8 pads to get the status for
+    for (var x = 0; x < 4; x++) {
         if (shifted == false)  {
             if ( PRODUCT_ID == MPK225_PID) {
                 setSwitchLED(x + S_225_BankB,bankAStatus,armed[x]);
@@ -272,7 +272,7 @@ function cursorTrackpitchObs() {
 }
 
 function initClipArray() {
-    for (var x = 0; x < 8; x++) {
+    for (var x = 0; x < 4; x++) {
         for (var y = 0; y < 16; y++) {
             newClipData = new padSceneData();
             newClipData.playing = false;
@@ -409,13 +409,9 @@ function onMidi(status, data1, data2)
                     setActivePadMode(PadInstrument);
                 }
                 if(data1 - S1 == 1) {
-                    activeClipBank = ClipBanks.Bank_A;
-                    println("just set active to " + activeClipBank);
                     setActivePadMode(PadClipLauncher);
                 }
                 else if(data1 - S1 == 2) {
-                    activeClipBank = ClipBanks.Bank_B;
-                    println("just set active to " + activeClipBank);
                     setActivePadMode(PadClipLauncher);
                 }
                 else if(data1 - S1 == 3) {
