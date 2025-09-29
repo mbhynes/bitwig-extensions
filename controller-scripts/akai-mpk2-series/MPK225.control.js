@@ -41,7 +41,7 @@ function init()
     // transport.isArrangerRecordEnabled().markInterested();
     // transport.isClipLauncherOverdubEnabled().markInterested();
 	application = host.createApplicationSection();
-    trackBank = host.createMainTrackBank(8, 2, 16);
+    trackBank = host.createMainTrackBank(4, 2, 16);
     sceneLaunchTrackBank = host.createTrackBank(1,0,64);
 
 
@@ -60,7 +60,7 @@ function init()
     trackBank.getClipLauncherScenes().addNameObserver(sceneLaunchObs());
 
 
-	for (var p = 0; p < 8; p++)
+	for (var p = 0; p < 4; p++)
 	{
 		var macro = primaryDevice.getMacro(p).getAmount();
 		var parameter = cursorDevice.getParameter(p);
