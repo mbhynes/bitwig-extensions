@@ -171,13 +171,21 @@ public class SessionLayer extends AbstractSessionLayer {
             if (useAlt.get()) {
                 slot.launchAlt();
             } else {
-                slot.select();
+                if (slot.hasContent().get()) {
+                    slot.deleteObject();
+                    slot.launch();
+                } else {
+                    slot.launch();
+                }
             }
         } else {
             slot.launch();
         }
-        // Always select the pressed slot to focus it
-        slot.select();
+        // If the slot has no content, select it to focus the track/slot
+        // We don't want to select a track if we're just switching which clips are playing
+        if (!slot.hasContent().get()) {
+            slot.select();
+        }
     }
 
     private void handleSlotReleased(final ClipLauncherSlot slot) {
