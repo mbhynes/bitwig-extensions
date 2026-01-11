@@ -74,13 +74,15 @@ public class SessionLayer extends AbstractSessionLayer {
             final int trackIndex = i;
             final Track track = trackBank.getItemAt(trackIndex);
             markTrack(track);
+            final BooleanValue equalsCursorTrack = track.createEqualsValue(viewControl.getCursorTrack());
+            equalsCursorTrack.markInterested();
             for (int j = 0; j < numberOfScenes; j++) {
                 final int sceneIndex = j;
                 final ClipLauncherSlot slot = track.clipLauncherSlotBank().getItemAt(sceneIndex);
                 prepareSlot(slot, sceneIndex, trackIndex);
 
                 final RgbButton button = hwElements.getGridButton(sceneIndex, trackIndex);
-                button.bindPressed(verticalLayer, () -> handleSlotPressed(slot));
+                button.bindPressed(verticalLayer, () -> handleSlotPressed(track, slot, equalsCursorTrack));
                 button.bindRelease(verticalLayer, () -> handleSlotReleased(slot));
                 button.bindLight(verticalLayer, () -> getState(track, slot, trackIndex, sceneIndex));
             }
@@ -92,13 +94,15 @@ public class SessionLayer extends AbstractSessionLayer {
             final int trackIndex = i;
             final Track track = trackBank.getItemAt(trackIndex);
             markTrack(track);
+            final BooleanValue equalsCursorTrack = track.createEqualsValue(viewControl.getCursorTrack());
+            equalsCursorTrack.markInterested();
             for (int j = 0; j < 8; j++) {
                 final int sceneIndex = j;
                 final ClipLauncherSlot slot = track.clipLauncherSlotBank().getItemAt(sceneIndex);
                 prepareSlot(slot, sceneIndex, trackIndex);
 
                 final RgbButton button = hwElements.getGridButton(trackIndex, sceneIndex);
-                button.bindPressed(horizontalLayer, () -> handleSlotPressed(slot));
+                button.bindPressed(horizontalLayer, () -> handleSlotPressed(track, slot, equalsCursorTrack));
                 button.bindRelease(horizontalLayer, () -> handleSlotReleased(slot));
                 button.bindLight(horizontalLayer, () -> getState(track, slot, trackIndex, sceneIndex));
             }
@@ -166,25 +170,46 @@ public class SessionLayer extends AbstractSessionLayer {
         return SingleLedState.OFF;
     }
 
-    private void handleSlotPressed(final ClipLauncherSlot slot) {
+    private void handleSlotPressed(final Track track, final ClipLauncherSlot slot, final BooleanValue equalsCursorTrack) {
+        // If the slot has no content
+        if (!slot.hasContent().get()) {
+            // If this is the currently selected instrument, launch the clip
+            if (equalsCursorTrack.get()) {
+                if (modifiers.isShift()) {
+                    if (useAlt.get()) {
+                        slot.launchAlt();
+                    } else {
+                        slot.launch();
+                    }
+                } else {
+                    slot.launch();
+                }
+            } else {
+                // Otherwise, just focus the track and slot in the UI without affecting playback
+                track.selectInEditor();
+            }
+            slot.select();
+            return;
+        }
+        
         if (modifiers.isShift()) {
             if (useAlt.get()) {
                 slot.launchAlt();
             } else {
-                if (slot.hasContent().get()) {
-                    slot.deleteObject();
-                    slot.launch();
-                } else {
-                    slot.launch();
-                }
+                slot.deleteObject();
+                slot.launch();
             }
         } else {
             slot.launch();
         }
-        // If the slot has no content, select it to focus the track/slot
-        // We don't want to select a track if we're just switching which clips are playing
-        if (!slot.hasContent().get()) {
+        // Select the currently playing slot if the channel (column) it pertains to is the currently selected instrument
+        if (equalsCursorTrack.get()) {
             slot.select();
+        } else if (slot.isPlaying().get()) {
+            // If we select a slot in another track that's already playing, select that track in the UI,
+            // but don't relaunch the clip. (Once its track is selected, however, clicking it again will relaunch the clip.)
+            slot.select();
+            track.selectInEditor();
         }
     }
 
