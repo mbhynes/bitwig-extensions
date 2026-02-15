@@ -8,6 +8,9 @@ import com.bitwig.extensions.framework.Layer;
 import com.bitwig.extensions.framework.di.Context;
 import com.bitwig.extensions.framework.values.FocusMode;
 
+import com.bitwig.extensions.controllers.maudio.oxygenpro.modes.SessionLayer;
+// import com.bitwig.extensions.controllers.maudio.oxygenpro.modes.ModeLayer;
+
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
@@ -30,6 +33,7 @@ public class OxygenProExtension extends ControllerExtension {
    private MidiOut midiOut;
    private MidiIn midiInKey;
    private final OxyConfig config;
+   private Application application;
 
    public OxygenProExtension(final OxygenProExtensionDefinition definition, final ControllerHost host,
                              OxyConfig config) {
@@ -41,6 +45,8 @@ public class OxygenProExtension extends ControllerExtension {
    public void init() {
       host = getHost();
       debugHost = host;
+      application = host.createApplication();
+      application.recordQuantizationGrid().markInterested();
       initPreferences(host);
       final Context diContext = new Context(this);
       diContext.registerService(OxyConfig.class, config);
@@ -66,23 +72,45 @@ public class OxygenProExtension extends ControllerExtension {
 
    void initTransport(Context diContext) {
       Transport transport = diContext.getService(Transport.class);
-      HwElements sessionLayer = diContext.getService(HwElements.class);
+      SessionLayer sessionLayer = diContext.getService(SessionLayer.class);
       transport.isArrangerRecordEnabled().markInterested();
       transport.isClipLauncherOverdubEnabled().markInterested();
       HwElements hwElements = diContext.getService(HwElements.class);
-      CcButton rewindButton = hwElements.getButton(OxygenCcAssignments.FAST_RWD);
-      rewindButton.bindRepeatHold(mainLayer, () -> transport.rewind());
-      CcButton forwardButton = hwElements.getButton(OxygenCcAssignments.FAST_FWD);
-      forwardButton.bindRepeatHold(mainLayer, () -> transport.fastForward());
 
       CcButton playButton = hwElements.getButton(OxygenCcAssignments.PLAY);
       playButton.bindPressed(mainLayer, transport.playAction());
+
+      CcButton bankRightButton = hwElements.getButton(OxygenCcAssignments.BANK_RIGHT);
+      bankRightButton.bindPressed(mainLayer, () -> sessionLayer.selectNextDevice());
+
+      CcButton bankLeftButton = hwElements.getButton(OxygenCcAssignments.BANK_LEFT);
+      bankLeftButton.bindPressed(mainLayer, () -> sessionLayer.selectPreviousDevice());
+
+      CcButton forwardButton = hwElements.getButton(OxygenCcAssignments.FAST_FWD);
+      forwardButton.bindPressed(mainLayer, () -> sessionLayer.selectNextRemotePage(debugHost));
+
+      CcButton rewindButton = hwElements.getButton(OxygenCcAssignments.FAST_RWD);
+      rewindButton.bindPressed(mainLayer, () -> sessionLayer.selectPreviousRemotePage(debugHost));
 
       CcButton stopButton = hwElements.getButton(OxygenCcAssignments.STOP);
       stopButton.bindPressed(mainLayer, transport.stopAction());
 
       CcButton loopButton = hwElements.getButton(OxygenCcAssignments.LOOP);
-      loopButton.bindPressed(mainLayer, transport.isArrangerLoopEnabled().toggleAction());
+      loopButton.bindPressed(mainLayer, () -> {
+         SettableEnumValue quantGrid = application.recordQuantizationGrid();
+         String current = quantGrid.get();
+         String[] values = {"1/4", "1/8", "1/16", "1/32", "OFF"};
+         int idx = 0;
+         for (int i = 0; i < values.length; i++) {
+            if (values[i].equalsIgnoreCase(current)) {
+               idx = i;
+               break;
+            }
+         }
+         int nextIdx = (idx + 1) % values.length;
+         quantGrid.set(values[nextIdx]);
+         host.showPopupNotification("Quantization: " + values[nextIdx]);
+      });
 
       hwElements.getButton(OxygenCcAssignments.METRO)
          .bindPressed(mainLayer, transport.isMetronomeEnabled().toggleAction());
@@ -100,10 +128,10 @@ public class OxygenProExtension extends ControllerExtension {
       shiftButton.bindPressed(mainLayer, () -> hwElements.getShiftActive().set(true));
       shiftButton.bindRelease(mainLayer, () -> hwElements.getShiftActive().set(false));
 
-//      CcButton backButton = hwElements.getButton(OxygenCcAssignments.BACK);
-//      ModeLayer modeLayer = diContext.getService(ModeLayer.class);
-//      backButton.bindPressed(mainLayer, () -> modeLayer.setIsActive(true));
-//      backButton.bindRelease(mainLayer, () -> modeLayer.setIsActive(false));
+      // CcButton backButton = hwElements.getButton(OxygenCcAssignments.BACK);
+      // ModeLayer modeLayer = diContext.getService(ModeLayer.class);
+      // backButton.bindPressed(mainLayer, () -> modeLayer.setIsActive(true));
+      // backButton.bindRelease(mainLayer, () -> modeLayer.setIsActive(false));
    }
 
    void initPreferences(final ControllerHost host) {

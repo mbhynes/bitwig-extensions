@@ -15,12 +15,12 @@ public class AkaiApcMiniDefinition extends ControllerExtensionDefinition {
 
    @Override
    public String getName() {
-      return "APC Mini mk2";
+      return "APC Mini mk2 - custom";
    }
 
    @Override
    public String getAuthor() {
-      return "Bitwig";
+      return "Bitwiggish";
    }
 
    @Override
@@ -40,7 +40,7 @@ public class AkaiApcMiniDefinition extends ControllerExtensionDefinition {
 
    @Override
    public String getHardwareModel() {
-      return "APC Mini mk2";
+      return "APC Mini mk2 - custom";
    }
 
    @Override

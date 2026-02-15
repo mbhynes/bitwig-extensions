@@ -24,6 +24,9 @@ public class SessionLayer extends Layer {
    private ModeHandler modeHandler;
    private boolean backButtonHeld = false;
    private final boolean hasSceneLaunchButtons;
+   private final PinnableCursorDevice cursorDevice;
+   private PadLayer padLayer;
+   private final CursorRemoteControlsPage remotes;
 
    public SessionLayer(Layers layers, HwElements hwElements, ViewControl viewControl, Transport transport,
                        OxyConfig config) {
@@ -37,6 +40,13 @@ public class SessionLayer extends Layer {
       trackBank.setShouldShowClipLauncherFeedback(true);
       this.numberOfTracks = trackBank.getSizeOfBank();
       this.cursorTrack = viewControl.getCursorTrack();
+      this.cursorDevice = viewControl.getCursorDevice();
+      cursorDevice.hasNext().markInterested();
+      cursorDevice.hasPrevious().markInterested();
+      cursorDevice.hasDrumPads().markInterested();
+      this.remotes = viewControl.getParameterBank();
+      remotes.selectedPageIndex().markInterested();
+      remotes.pageCount().markInterested();
       for (int tInd = 0; tInd < numberOfTracks; tInd++) {
          final int trackIndex = tInd;
          Track track = trackBank.getItemAt(tInd);
@@ -189,6 +199,49 @@ public class SessionLayer extends Layer {
          slotColors[buttonIndex] = RgbColor.toColor(r, g, b);
       });
    }
+   public void selectPreviousDevice() {
+      if (cursorDevice.hasPrevious().get()) {
+         cursorDevice.selectPrevious();
+      } else {
+         cursorDevice.selectParent();
+      }
+   }
 
+   public void selectNextDevice() {
+      // host.println("CursorDevice: " + cursorDevice.toString());
+      if (cursorDevice.hasDrumPads().get() && padLayer != null) {
+         Device device = this.padLayer.getSelectedPadDevice();
+         // host.println("Found drum pad device: " + device.toString());
+         if (device.exists().get()) {
+            cursorDevice.selectDevice(device);
+         }
+      } else {
+         // host.println("No drumpad device; selecting next in chain");
+         cursorDevice.selectNext();
+      }
+   }
+
+   public void setPadLayer(PadLayer padLayer) {
+      this.padLayer = padLayer;
+   }
+
+   public void selectNextRemotePage(ControllerHost host) {
+      int current = remotes.selectedPageIndex().get();
+      int count = remotes.pageCount().get();
+      int target = (current + 1) % count;
+      host.println(String.format("On page %d/%d; requesting page %d", current, count, target));
+      remotes.selectedPageIndex().set(target);
+      cursorDevice.selectInEditor();
+   }
+
+   public void selectPreviousRemotePage(ControllerHost host) {
+      int current = remotes.selectedPageIndex().get();
+      int count = remotes.pageCount().get();
+      // Java modulo doesn't return a value in [0, count - 1], so have to double modulo
+      int target = ((current - 1) % count + count) % count;
+      host.println(String.format("On page %d/%d; requesting page %d", current, count, target));
+      remotes.selectedPageIndex().set(target);
+      cursorDevice.selectInEditor();
+   }
 
 }
